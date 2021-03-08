@@ -9,23 +9,22 @@ import pandas as pd
 
 # Headless 크롬 옵션
 options = webdriver.ChromeOptions()
-options.add_argument('headless')
+options.headless = True
 options.add_argument('disable-gpu')
 options.add_argument('lang=ko_KR')
-driver = webdriver.Chrome(chromedriver, options=options)
 
-driver = webdriver.Chrome('C:/Users/sunup/PycharmProjects/seldocbot/chromedriver_win32/chromedriver.exe')
+driver = webdriver.Chrome(executable_path='C:/Users/sunup/PycharmProjects/seldocbot/chromedriver_win32/chromedriver.exe', options=options)
 driver.get('http://freeforms.co.kr')
 driver.implicitly_wait(3)
 
-
-
-
+tag_names = driver.find_element_by_css_selector(".contents_list").find_elements_by_tag_name("a")
+for tag in tag_names:
+    print(tag.text.split("\n"))
 
 user_input = quote_plus(input('원하는 서식 번호를 입력해주세요'))
 time.sleep(3)
 
-try:  # 정상 처리
+'''try:  # 정상 처리
     element = WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CLASS_NAME, 'subject')))
     doc_list = []
     pageNum = int(driver.find_element_by_class_name('_totalCount').text)
@@ -53,4 +52,4 @@ try:  # 정상 처리
 
         driver.find_element_by_xpath('//*[@id="content"]/div[4]/div[' + str(1 + j * 5) + ']/a/text()').extract() # //*[@id="content"]/div[4]/div[1]/a
         driver.find_element_by_xpath('//*[@id="content"]/div[4]/div[' + str(2 + j * 5) + ']/a/@href').click # # //*[@id="content"]/div[4]/div[2]/a
-        time.sleep(2)
+        time.sleep(2)'''
