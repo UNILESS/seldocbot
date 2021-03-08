@@ -27,6 +27,8 @@ driver = webdriver.Chrome(executable_path='C:/Users/sunup/PycharmProjects/seldoc
 driver.get('http://freeforms.co.kr')
 driver.implicitly_wait(3)
 
+
+
 tag_names = driver.find_element_by_id("top-memu-wrap").find_elements_by_tag_name("a")
 i = 1
 for tag in tag_names:
@@ -63,26 +65,30 @@ url = f'http://freeforms.co.kr{url}'
 
 driver.get(url)
 
+
 try:  # 정상 처리
     element = WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CLASS_NAME, 'title')))
     doc_list = []
     pageNum = len(driver.find_element_by_tag_name("li").find_elements_by_class_name("page_box"))
     print("총", pageNum, "페이지 입니다.")
     print("현재 1페이지 입니다.")
-    j = 2
+
+    j = 1
+
     for i in range(0, pageNum):
-        doc_data = driver.find_elements_by_class_name('subject')
+        doc_data = driver.find_elements_by_class_name('title') # 0
         download_data = len(driver.find_elements_by_class_name('contents_list-2'))
         webpage = requests.get(url)
         soup = BeautifulSoup(webpage.content, "html.parser")
 
+        print(len(doc_data))
+
         for k in doc_data:
-            theater_list.append(k.text.split('\n'))
+            doc_list.append(k.text.split('\n'))
+
 
         num = 1
         i = 0
-        print(len(soup.select(".contents_list")))
-        print(len(soup.select(".contents_list-2")))
         for href in soup.select(".contents_list-2"):
             new_url = "http://freeforms.co.kr" + href.find("a")["href"]
             print(new_url)
@@ -99,13 +105,39 @@ try:  # 정상 처리
             # //*[@id="content"]/div[4]/div[2]/a
 
         time.sleep(2)  # 웹페이지를 불러오기 위해 2초 정지
-        print("현재", j, "페이지 입니다.")
-        print(soup.select(".page_box"))
         # //*[@id="content"]/div[6]/ul/a[1]
-        print(new_page)
         j += 1
+
         if (j > pageNum):
             break
+
+        if user_input == 1:
+            url = "/form100/form_"+str(j)+".html"
+        elif user_input == 2:
+            url = "/form104/form_"+str(j)+".html"
+        elif user_input == 3:
+            url = "/form110/form_"+str(j)+".html"
+        elif user_input == 4:
+            url = "/form116/form_"+str(j)+".html"
+        elif user_input == 5:
+            url = "/form120/form_"+str(j)+".html"
+        elif user_input == 6:
+            url = "/form130/form_"+str(j)+".html"
+        elif user_input == 7:
+            url = "/form140/form_"+str(j)+".html"
+        elif user_input == 8:
+            url = "/form200/form_"+str(j)+".html"
+        elif user_input == 9:
+            url = "/form210/form_"+str(j)+".html"
+        elif user_input == 10:
+            url = "/form220/form_"+str(j)+".html"
+        elif user_input == 11:
+            url = "/form230/form_"+str(j)+".html"
+
+        url = f'http://freeforms.co.kr{url}'
+        driver.get(url)
+        print("현재", j, "페이지 입니다.")
+
         # //*[@id="content"]/div[6]/ul/a[1]
 
 
@@ -114,6 +146,9 @@ except TimeoutException:  # 예외 처리
 
 finally:  # 정상, 예외 둘 중 하나여도 반드시 실행
     driver.quit()
+
+print(len(doc_list))
+
 for i in range(len(doc_list)):
     doc_list[i].append(doc_list[i][1])
 
