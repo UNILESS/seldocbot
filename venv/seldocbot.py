@@ -81,7 +81,7 @@ try:  # 정상 처리
         webpage = requests.get(url)
         soup = BeautifulSoup(webpage.content, "html.parser")
 
-        print(len(doc_data))
+        print(len(doc_data)) # 57개
 
         for k in doc_data:
             doc_list.append(k.text.split('\n'))
@@ -147,12 +147,13 @@ except TimeoutException:  # 예외 처리
 finally:  # 정상, 예외 둘 중 하나여도 반드시 실행
     driver.quit()
 
-print(len(doc_list))
+print("doc_list : ", len(doc_list))
 
-for i in range(len(doc_list)):
+for i  in range(len(doc_list)):
     doc_list[i].append(doc_list[i][1])
 
-doc_df = pd.DataFrame(doc_list, columns=['문서명'])
+doc_df = pd.DataFrame(doc_list, columns=['문서명', 'URL'])
 doc_df.index = doc_df.index + 1
+
 doc_df.to_csv(f'doc_{user_input}_df.csv', mode='w', encoding='utf-8-sig',header=True, index=True)
 print('웹 크롤링이 완료되었습니다.')
