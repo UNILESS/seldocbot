@@ -73,7 +73,7 @@ try:  # 정상 처리
         time.sleep(2)  # 웹페이지를 불러오기 위해 2초 정지
 
 except TimeoutException:  # 예외 처리
-    print('해당 페이지에 연극 정보가 존재하지 않습니다.')
+    print('해당 페이지에 문서가 존재하지 않습니다.')
 
 finally:  # 정상, 예외 둘 중 하나여도 반드시 실행
     driver.quit()
