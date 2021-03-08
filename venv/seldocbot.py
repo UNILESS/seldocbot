@@ -77,5 +77,10 @@ except TimeoutException:  # 예외 처리
 
 finally:  # 정상, 예외 둘 중 하나여도 반드시 실행
     driver.quit()
+for i in range(len(doc_list)):
+    doc_list[i].append(doc_list[i][1])
 
+doc_df = pd.DataFrame(doc_list, columns=['문서명'])
+doc_df.index = doc_df.index + 1
+doc_df.to_csv(f'doc_{_input}_df.csv', mode='w', encoding='utf-8-sig',header=True, index=True)
 print('웹 크롤링이 완료되었습니다.')
