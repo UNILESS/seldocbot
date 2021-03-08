@@ -11,11 +11,17 @@ import requests
 
 # Headless 크롬 옵션
 options = webdriver.ChromeOptions()
-options.headless = True
+options.add_argument('--incognito')
+options.headless = False
 options.add_argument('disable-gpu')
 options.add_argument('lang=ko_KR')
 
-
+options.add_experimental_option("prefs", {
+  "download.default_directory": r"C:/Users/sunup/Desktop/docdown",
+  "download.prompt_for_download": False,
+  "download.directory_upgrade": True,
+  "safebrowsing.enabled": True
+})
 
 driver = webdriver.Chrome(executable_path='C:/Users/sunup/PycharmProjects/seldocbot/chromedriver_win32/chromedriver.exe', options=options)
 driver.get('http://freeforms.co.kr')
@@ -61,7 +67,8 @@ try:  # 정상 처리
     element = WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CLASS_NAME, 'title')))
     doc_list = []
     pageNum = len(driver.find_element_by_tag_name("li").find_elements_by_class_name("page_box"))
-    print(pageNum)
+    print("총", pageNum, "페이지 입니다.")
+    print("현재 1페이지 입니다.")
     for i in range(1, pageNum):
         doc_data = driver.find_elements_by_class_name('subject')
         download_data = len(driver.find_elements_by_class_name('contents_list-2'))
@@ -75,12 +82,20 @@ try:  # 정상 처리
         for href in soup.select(".contents_list-2"):
             new_url = "http://freeforms.co.kr" + href.find("a")["href"]
             print(new_url)
-            driver.Url = new_url
+            '''go = "http://freeforms.co.kr" + href.find("a")["href"]
+            driver.get(go)'''
+            # driver.execute_script("arguments[0].click();", go)
             print(num, "개 다운 완료.")
             num += 1
             # //*[@id="content"]/div[4]/div[2]/a
+        j = 2
+        for page_href in soup.select(".content"):
+            print("현재", j, "페이지 입니다.")
+            new_page = "http://freeforms.co.kr" + page_href.find("a")["herf"]
+            print(new_page)
+            j += 1
+        # //*[@id="content"]/div[6]/ul/a[1]
 
-        driver.find_element_by_xpath('//*[@id="content"]/div[6]/ul/a['+ str(pageNum) +']').click()
         time.sleep(2)  # 웹페이지를 불러오기 위해 2초 정지
 
 except TimeoutException:  # 예외 처리
