@@ -51,32 +51,31 @@ elif user_input == 11:
 
 url = f'http://freeforms.co.kr{url}'
 
-'''try:  # 정상 처리
-    element = WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CLASS_NAME, 'subject')))
+
+try:  # 정상 처리
+    element = WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CLASS_NAME, 'title')))
     doc_list = []
-    pageNum = int(driver.find_element_by_class_name('_totalCount').text)
+    pageNum = int(driver.find_element_by_class_name('page_box').text)
     count = 0
 
     for i in range(1, pageNum):
         doc_data = driver.find_elements_by_class_name('subject')
         download_data = driver.find_elements_by_class_name('list_thumb')
 
-        for k in theater_data:
+        for k in doc_data:
             theater_list.append(k.text.split('\n'))
 
-        for j in img_data:  # 이미지 크롤링
+        for j in download_data:  # hwp 크롤링
             count += 1
-            j.screenshot(f'img/{count}.png')
+            driver.find_element_by_xpath('//*[@id="content"]/div[4]/div[' + str(2 + j * 5) + ']/a/@href').click
 
-        driver.find_element_by_xpath("//a[@class='btn_page_next _btnNext on']").click()
+        driver.find_element_by_xpath('//*[@id="content"]/div[6]/ul/a['+ str(pageNum) +']').click()
         time.sleep(2)  # 웹페이지를 불러오기 위해 2초 정지
 
-    for i in range(1, pageNum):
-        theater_data = driver.find_elements_by_class_name('list_title')
+except TimeoutException:  # 예외 처리
+    print('해당 페이지에 연극 정보가 존재하지 않습니다.')
 
-        for k in theater_data:
-            theater_list.append(k.text.split('\n'))
+finally:  # 정상, 예외 둘 중 하나여도 반드시 실행
+    driver.quit()
 
-        driver.find_element_by_xpath('//*[@id="content"]/div[4]/div[' + str(1 + j * 5) + ']/a/text()').extract() # //*[@id="content"]/div[4]/div[1]/a
-        driver.find_element_by_xpath('//*[@id="content"]/div[4]/div[' + str(2 + j * 5) + ']/a/@href').click # # //*[@id="content"]/div[4]/div[2]/a
-        time.sleep(2)'''
+print('웹 크롤링이 완료되었습니다.')
