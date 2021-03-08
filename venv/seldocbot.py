@@ -4,14 +4,18 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
+from bs4 import BeautifulSoup
 import time
 import pandas as pd
+import requests
 
 # Headless 크롬 옵션
 options = webdriver.ChromeOptions()
 options.headless = True
 options.add_argument('disable-gpu')
 options.add_argument('lang=ko_KR')
+
+
 
 driver = webdriver.Chrome(executable_path='C:/Users/sunup/PycharmProjects/seldocbot/chromedriver_win32/chromedriver.exe', options=options)
 driver.get('http://freeforms.co.kr')
@@ -61,17 +65,23 @@ try:  # 정상 처리
     print(pageNum)
     for i in range(1, pageNum):
         doc_data = driver.find_elements_by_class_name('subject')
-        download_data = driver.find_elements_by_class_name('contents_list-2')
+        download_data = len(driver.find_elements_by_class_name('contents_list-2'))
+
 
         for k in doc_data:
             theater_list.append(k.text.split('\n'))
 
 
-        for j in download_data:  # hwp 크롤링
+        for j in range(download_data):  # hwp 크롤링
             count += 1
-            num = 2 + j.getText() * 5
-            driver.find_element_by_xpath('//*[@id="content"]/div[4]/div[' + num + ']/a/@href').click
-            print("j번 다운 완료.")
+            webpage = requests.get(url)
+            soup = BeautifulSoup(webpage.content, "html.parser")
+            for href in soup.select(".contents_list-2"):
+                new_url = "http://freeforms.co.kr" + href.find("a")["href"]
+                print(new_url)
+                driver.Url = new_url
+                print(j, "개 다운 완료.")
+            # //*[@id="content"]/div[4]/div[2]/a
 
         driver.find_element_by_xpath('//*[@id="content"]/div[6]/ul/a['+ str(pageNum) +']').click()
         time.sleep(2)  # 웹페이지를 불러오기 위해 2초 정지
