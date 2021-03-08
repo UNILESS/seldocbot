@@ -69,6 +69,7 @@ driver.get(url)
 try:  # 정상 처리
     element = WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CLASS_NAME, 'title')))
     doc_list = []
+    link = []
     pageNum = len(driver.find_element_by_tag_name("li").find_elements_by_class_name("page_box"))
     print("총", pageNum, "페이지 입니다.")
     print("현재 1페이지 입니다.")
@@ -91,6 +92,7 @@ try:  # 정상 처리
         i = 0
         for href in soup.select(".contents_list-2"):
             new_url = "http://freeforms.co.kr" + href.find("a")["href"]
+            link.append("http://freeforms.co.kr" + href.find("a")["href"])
             print(new_url)
             for name_href in soup.select(".contents_list"): # in 2
                 # driver.execute_script("arguments[0].click();", go)
@@ -149,10 +151,8 @@ finally:  # 정상, 예외 둘 중 하나여도 반드시 실행
 
 print("doc_list : ", len(doc_list))
 
-for i  in range(len(doc_list)):
-    doc_list[i].append(doc_list[i][1])
-
-doc_df = pd.DataFrame(doc_list, columns=['문서명', 'URL'])
+doc_df = pd.DataFrame({'문서명': doc_list, 'URL': link})
+doc_df = pd.DataFrame(zip(doc_list, link), columns=['문서명', 'URL'])
 doc_df.index = doc_df.index + 1
 
 doc_df.to_csv(f'doc_{user_input}_df.csv', mode='w', encoding='utf-8-sig',header=True, index=True)
