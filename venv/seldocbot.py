@@ -61,26 +61,23 @@ try:  # 정상 처리
     element = WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CLASS_NAME, 'title')))
     doc_list = []
     pageNum = len(driver.find_element_by_tag_name("li").find_elements_by_class_name("page_box"))
-    count = 0
     print(pageNum)
     for i in range(1, pageNum):
         doc_data = driver.find_elements_by_class_name('subject')
         download_data = len(driver.find_elements_by_class_name('contents_list-2'))
-
+        webpage = requests.get(url)
+        soup = BeautifulSoup(webpage.content, "html.parser")
 
         for k in doc_data:
             theater_list.append(k.text.split('\n'))
 
-
-        for j in range(download_data):  # hwp 크롤링
-            count += 1
-            webpage = requests.get(url)
-            soup = BeautifulSoup(webpage.content, "html.parser")
-            for href in soup.select(".contents_list-2"):
-                new_url = "http://freeforms.co.kr" + href.find("a")["href"]
-                print(new_url)
-                driver.Url = new_url
-                print(j, "개 다운 완료.")
+        num = 1
+        for href in soup.select(".contents_list-2"):
+            new_url = "http://freeforms.co.kr" + href.find("a")["href"]
+            print(new_url)
+            driver.Url = new_url
+            print(num, "개 다운 완료.")
+            num += 1
             # //*[@id="content"]/div[4]/div[2]/a
 
         driver.find_element_by_xpath('//*[@id="content"]/div[6]/ul/a['+ str(pageNum) +']').click()
