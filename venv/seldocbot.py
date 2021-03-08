@@ -12,15 +12,15 @@ import requests
 # Headless 크롬 옵션
 options = webdriver.ChromeOptions()
 options.add_argument('--incognito')
-options.headless = False
+options.headless = True
 options.add_argument('disable-gpu')
 options.add_argument('lang=ko_KR')
 
 options.add_experimental_option("prefs", {
-  "download.default_directory": r"C:/Users/sunup/Desktop/docdown",
-  "download.prompt_for_download": False,
-  "download.directory_upgrade": True,
-  "safebrowsing.enabled": True
+    "download.default_directory": r"C:/Users/sunup/Desktop/docdown",
+    "download.prompt_for_download": False,
+    "download.directory_upgrade": True,
+    "safebrowsing.enabled": True
 })
 
 driver = webdriver.Chrome(executable_path='C:/Users/sunup/PycharmProjects/seldocbot/chromedriver_win32/chromedriver.exe', options=options)
@@ -69,7 +69,8 @@ try:  # 정상 처리
     pageNum = len(driver.find_element_by_tag_name("li").find_elements_by_class_name("page_box"))
     print("총", pageNum, "페이지 입니다.")
     print("현재 1페이지 입니다.")
-    for i in range(1, pageNum):
+    j = 2
+    for i in range(0, pageNum):
         doc_data = driver.find_elements_by_class_name('subject')
         download_data = len(driver.find_elements_by_class_name('contents_list-2'))
         webpage = requests.get(url)
@@ -79,24 +80,34 @@ try:  # 정상 처리
             theater_list.append(k.text.split('\n'))
 
         num = 1
+        i = 0
+        print(len(soup.select(".contents_list")))
+        print(len(soup.select(".contents_list-2")))
         for href in soup.select(".contents_list-2"):
             new_url = "http://freeforms.co.kr" + href.find("a")["href"]
             print(new_url)
-            '''go = "http://freeforms.co.kr" + href.find("a")["href"]
-            driver.get(go)'''
-            # driver.execute_script("arguments[0].click();", go)
-            print(num, "개 다운 완료.")
-            num += 1
+            for name_href in soup.select(".contents_list"): # in 2
+                # driver.execute_script("arguments[0].click();", go)
+                # driver.find_element_by_xpath('//*[@id="content"]/div[4]/div[' + str(1 + j * 5) + ']/a/text()').extract()
+                name = soup.select(".contents_list-1 > a")[i].text
+                # // *[ @ id = "content"] / div[4] / div[1] / a
+                # // *[ @ id = "content"] / div[4] / div[6] / a
+                print(i + 1,".", name,"다운로드 완료.")
+                i += 1
+                if (i >= 1):
+                    break
             # //*[@id="content"]/div[4]/div[2]/a
-        j = 2
-        for page_href in soup.select(".content"):
-            print("현재", j, "페이지 입니다.")
-            new_page = "http://freeforms.co.kr" + page_href.find("a")["herf"]
-            print(new_page)
-            j += 1
-        # //*[@id="content"]/div[6]/ul/a[1]
 
         time.sleep(2)  # 웹페이지를 불러오기 위해 2초 정지
+        print("현재", j, "페이지 입니다.")
+        print(soup.select(".page_box"))
+        # //*[@id="content"]/div[6]/ul/a[1]
+        print(new_page)
+        j += 1
+        if (j > pageNum):
+            break
+        # //*[@id="content"]/div[6]/ul/a[1]
+
 
 except TimeoutException:  # 예외 처리
     print('해당 페이지에 문서가 존재하지 않습니다.')
