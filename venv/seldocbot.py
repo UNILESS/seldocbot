@@ -14,23 +14,26 @@ options.add_argument('disable-gpu')
 options.add_argument('lang=ko_KR')
 driver = webdriver.Chrome(chromedriver, options=options)
 
-driver = webdriver.Chrome('C:/Users/sunup/PycharmProjects/chromedriver_win32/chromedriver.exe')
-
-driver.implicitly_wait(3)
+driver = webdriver.Chrome('C:/Users/sunup/PycharmProjects/seldocbot/chromedriver_win32/chromedriver.exe')
 driver.get('http://freeforms.co.kr')
+driver.implicitly_wait(3)
+
+
+
+
 
 user_input = quote_plus(input('원하는 서식 번호를 입력해주세요'))
 time.sleep(3)
 
 try:  # 정상 처리
-    element = WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CLASS_NAME, 'list_title')))  # 해당 태그 존재 여부를 확인하기까지 3초 정지
-    theater_list = []
+    element = WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CLASS_NAME, 'subject')))
+    doc_list = []
     pageNum = int(driver.find_element_by_class_name('_totalCount').text)
     count = 0
 
     for i in range(1, pageNum):
-        theater_data = driver.find_elements_by_class_name('list_title')
-        img_data = driver.find_elements_by_class_name('list_thumb')
+        doc_data = driver.find_elements_by_class_name('subject')
+        download_data = driver.find_elements_by_class_name('list_thumb')
 
         for k in theater_data:
             theater_list.append(k.text.split('\n'))
@@ -42,7 +45,7 @@ try:  # 정상 처리
         driver.find_element_by_xpath("//a[@class='btn_page_next _btnNext on']").click()
         time.sleep(2)  # 웹페이지를 불러오기 위해 2초 정지
 
-for i in range(1, pageNum):
+    for i in range(1, pageNum):
         theater_data = driver.find_elements_by_class_name('list_title')
 
         for k in theater_data:
