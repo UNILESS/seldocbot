@@ -9,7 +9,7 @@ import time
 import pandas as pd
 import requests
 
-# Headless 크롬 옵션
+# 크롬 옵션
 options = webdriver.ChromeOptions()
 options.add_argument('--incognito')
 options.headless = True
@@ -37,8 +37,11 @@ for tag in tag_names:
 
 user_input = int(quote_plus(input('\n원하는 서식 번호를 입력해주세요: ')))
 
-html = driver.page_source
+if user_input > len(tag_names) or user_input < 1:
+    print("존재하지 않는 서식입니다. 다시 실행하여주세요")
+    exit()
 
+html = driver.page_source
 soup = BeautifulSoup(html, 'html.parser')
 
 for href in soup.select('#top-memu-wrap'):
@@ -75,7 +78,8 @@ try:  # 정상 처리
             link.append("http://freeforms.co.kr" + href.find("a")["href"])
             print(new_url)
             for name_href in soup.select(".contents_list"): # in 2
-                # driver.get(new_url) # 다운로드 코드 주석
+                # driver.get(new_url) # 다운
+                time.sleep(1)
                 name = soup.select(".contents_list-1 > a")[i].text
                 # // *[ @ id = "content"] / div[4] / div[1] / a
                 # //*[@id="content"]/div[4]/div[2]/a
