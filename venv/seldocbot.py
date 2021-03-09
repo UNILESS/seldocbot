@@ -12,7 +12,7 @@ import requests
 # Headless 크롬 옵션
 options = webdriver.ChromeOptions()
 options.add_argument('--incognito')
-options.headless = True
+options.headless = False
 options.add_argument('disable-gpu')
 options.add_argument('lang=ko_KR')
 
@@ -74,7 +74,7 @@ try:  # 정상 처리
     print("총", pageNum, "페이지 입니다.")
     print("현재 1페이지 입니다.")
 
-    j = 1
+    j = 0
 
     for i in range(0, pageNum):
         doc_data = driver.find_elements_by_class_name('title') # 0
@@ -82,7 +82,7 @@ try:  # 정상 처리
         webpage = requests.get(url)
         soup = BeautifulSoup(webpage.content, "html.parser")
 
-        print(len(doc_data)) # 57개
+        print(len(doc_data))
 
         for k in doc_data:
             doc_list.append(k.text.split('\n'))
@@ -95,10 +95,12 @@ try:  # 정상 처리
             link.append("http://freeforms.co.kr" + href.find("a")["href"])
             print(new_url)
             for name_href in soup.select(".contents_list"): # in 2
-                driver.find_element_by_xpath('//*[@id="content"]/div[4]/div[' + str(1 + j * 5) + ']/a/text()').extract()
+                driver.get(new_url)
+                driver.implicitly_wait(1)
+                #driver.find_element_by_xpath('//*[@id="content"]/div[4]/div[' + str(2 + j * 5) + ']/a/text()').extract()
                 name = soup.select(".contents_list-1 > a")[i].text
                 # // *[ @ id = "content"] / div[4] / div[1] / a
-                # // *[ @ id = "content"] / div[4] / div[6] / a
+                # //*[@id="content"]/div[4]/div[2]/a
                 print(i + 1,".", name,"다운로드 완료.")
                 i += 1
                 if (i >= 1):
@@ -137,10 +139,9 @@ try:  # 정상 처리
 
         url = f'http://freeforms.co.kr{url}'
         driver.get(url)
-        print("현재", j, "페이지 입니다.")
+        print("현재", j, "페이지 다운로드를 마쳤습니다.")
 
         # //*[@id="content"]/div[6]/ul/a[1]
-
 
 except TimeoutException:  # 예외 처리
     print('해당 페이지에 문서가 존재하지 않습니다.')
