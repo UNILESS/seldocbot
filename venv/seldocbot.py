@@ -75,7 +75,7 @@ try:  # 정상 처리
             link.append("http://freeforms.co.kr" + href.find("a")["href"])
             print(new_url)
             for name_href in soup.select(".contents_list"): # in 2
-                # driver.get(new_url) 다운로드 코드 주석
+                driver.get(new_url) # 다운로드 코드 주석
                 name = soup.select(".contents_list-1 > a")[i].text
                 # // *[ @ id = "content"] / div[4] / div[1] / a
                 # //*[@id="content"]/div[4]/div[2]/a
@@ -92,7 +92,7 @@ try:  # 정상 처리
 
         url = url[:36] + str(j) + '.html'
         driver.get(url)
-        print("현재", j, "페이지 다운로드를 마쳤습니다.")
+        print("\n현재", j, "페이지 다운로드를 마쳤습니다.")
 
         j += 1
         # //*[@id="content"]/div[6]/ul/a[1]
