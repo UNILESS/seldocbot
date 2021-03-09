@@ -12,7 +12,7 @@ import requests
 # Headless 크롬 옵션
 options = webdriver.ChromeOptions()
 options.add_argument('--incognito')
-options.headless = False
+options.headless = True
 options.add_argument('disable-gpu')
 options.add_argument('lang=ko_KR')
 
@@ -82,7 +82,7 @@ try:  # 정상 처리
         webpage = requests.get(url)
         soup = BeautifulSoup(webpage.content, "html.parser")
 
-        print(len(doc_data))
+        # print(len(doc_data))
 
         for k in doc_data:
             doc_list.append(k.text.split('\n'))
