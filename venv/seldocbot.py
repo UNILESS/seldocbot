@@ -95,9 +95,8 @@ try:  # 정상 처리
             link.append("http://freeforms.co.kr" + href.find("a")["href"])
             print(new_url)
             for name_href in soup.select(".contents_list"): # in 2
-                driver.get(new_url)
-                driver.implicitly_wait(1)
-                #driver.find_element_by_xpath('//*[@id="content"]/div[4]/div[' + str(2 + j * 5) + ']/a/text()').extract()
+                # driver.get(new_url) 다운
+                # driver.implicitly_wait(1) waiting
                 name = soup.select(".contents_list-1 > a")[i].text
                 # // *[ @ id = "content"] / div[4] / div[1] / a
                 # //*[@id="content"]/div[4]/div[2]/a
