@@ -12,7 +12,7 @@ import requests
 # 크롬 옵션
 options = webdriver.ChromeOptions()
 options.add_argument('--incognito')
-options.headless = True
+options.headless = False
 options.add_argument('disable-gpu')
 options.add_argument('lang=ko_KR')
 
@@ -29,6 +29,7 @@ driver.get('http://freeforms.co.kr')
 driver.implicitly_wait(3)
 
 tag_names = driver.find_element_by_id("top-memu-wrap").find_elements_by_tag_name("a")
+
 i = 1
 print("******서식******")
 for tag in tag_names:
@@ -52,20 +53,35 @@ url = f'http://freeforms.co.kr{doctypeurl}'
 
 driver.get(url)
 
+j = 0
+
 try:  # 정상 처리
+    ten = 1
     element = WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CLASS_NAME, 'title')))
     doc_list = []
     link = []
     pageNum = len(driver.find_element_by_tag_name("li").find_elements_by_class_name("page_box"))
-    print("총", pageNum, "페이지 입니다.")
+    if pageNum < 10:
+        ten = 2
+    while pageNum >= 10:
+        print("페이지수 탐색 시작")
+        element = WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CLASS_NAME, 'title')))
+        pageNum = len(driver.find_element_by_tag_name("li").find_elements_by_class_name("page_box"))
+        print(pageNum)
+        html = driver.page_source
+        soup = BeautifulSoup(html, 'html.parser')
+        url = url[:36] + str(ten * 10 + 1) + '.html'
+        print(url)
+        driver.get(url)
+        ten += 1
+    print("총", (ten - 2) * 10 + pageNum, "페이지 입니다.")
+    driver.get(url[:36] + str(1) + '.html')
     print("현재 1 페이지 입니다.")
 
-    j = 1
-
-    for i in range(0, pageNum):
-        doc_data = driver.find_elements_by_class_name('title') # 0
+    for i in range(0, (ten - 2) * 10 + pageNum):
+        doc_data = driver.find_elements_by_class_name('title')
         download_data = len(driver.find_elements_by_class_name('contents_list-2'))
-        webpage = requests.get(url)
+        webpage = requests.get(url[:36] + str(i+1) + '.html')
         soup = BeautifulSoup(webpage.content, "html.parser")
 
         for k in doc_data:
@@ -73,13 +89,15 @@ try:  # 정상 처리
 
         i = 0
 
+        print("수프", len(soup.select(".contents_list-2")))
+
         for href in soup.select(".contents_list-2"):
             new_url = "http://freeforms.co.kr" + href.find("a")["href"]
             link.append("http://freeforms.co.kr" + href.find("a")["href"])
             print(new_url)
-            for name_href in soup.select(".contents_list"): # in 2
+            for name_href in soup.select(".contents_list"):
                 # driver.get(new_url) # 다운
-                time.sleep(1)
+                # time.sleep(1) DDoS 방지용
                 name = soup.select(".contents_list-1 > a")[i].text
                 # // *[ @ id = "content"] / div[4] / div[1] / a
                 # //*[@id="content"]/div[4]/div[2]/a
@@ -89,14 +107,14 @@ try:  # 정상 처리
                     break
             # //*[@id="content"]/div[4]/div[2]/a
 
-        time.sleep(2)  # 웹페이지를 불러오기 위해 2초 정지
+        time.sleep(1)  # 웹페이지를 불러오기 위해 2초 정지
 
-        if (j > pageNum):
+        if (j > (ten - 2) * 10 + pageNum):
             break
 
-        url = url[:36] + str(j) + '.html'
+        url = url[:36] + str(j+2) + '.html'
         driver.get(url)
-        print("\n현재", j, "페이지 다운로드를 마쳤습니다.")
+        print("\n현재", j + 1, "페이지 다운로드를 마쳤습니다. \n")
 
         j += 1
         # //*[@id="content"]/div[6]/ul/a[1]
@@ -108,6 +126,7 @@ finally:  # 정상, 예외 둘 중 하나여도 반드시 실행
     driver.quit()
 
 print("총 다운받은 문서의 개수:", len(doc_list))
+print(len(link))
 
 doc_df = pd.DataFrame({'문서명': doc_list, 'URL': link})
 doc_df = pd.DataFrame(zip(doc_list, link), columns=['문서명', 'URL'])
