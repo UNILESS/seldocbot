@@ -66,7 +66,6 @@ try:  # 정상 처리
     while pageNum >= 10:
         element = WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CLASS_NAME, 'title')))
         pageNum = len(driver.find_element_by_tag_name("li").find_elements_by_class_name("page_box"))
-        print(pageNum)
         html = driver.page_source
         soup = BeautifulSoup(html, 'html.parser')
         url = url[:36] + str(ten * 10 + 1) + '.html'
@@ -86,8 +85,6 @@ try:  # 정상 처리
             doc_list.append(k.text.split('\n'))
 
         i = 0
-
-        print("수프", len(soup.select(".contents_list-2")))
 
         for href in soup.select(".contents_list-2"):
             new_url = "http://freeforms.co.kr" + href.find("a")["href"]
