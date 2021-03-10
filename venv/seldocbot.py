@@ -12,7 +12,7 @@ import requests
 # 크롬 옵션
 options = webdriver.ChromeOptions()
 options.add_argument('--incognito')
-options.headless = False
+options.headless = True
 options.add_argument('disable-gpu')
 options.add_argument('lang=ko_KR')
 
@@ -56,26 +56,44 @@ driver.get(url)
 j = 0
 
 try:  # 정상 처리
-    ten = 1
+    ten = 0
     element = WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CLASS_NAME, 'title')))
     doc_list = []
     link = []
     pageNum = len(driver.find_element_by_tag_name("li").find_elements_by_class_name("page_box"))
-    if pageNum < 10:
-        ten = 2
-    while pageNum >= 10:
+
+    while True:
+        if len(driver.find_elements_by_class_name("page_box_b")) == 0:
+            # print(len(driver.find_element_by_tag_name("li").find_elements_by_class_name("page_box")))
+            element = WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CLASS_NAME, 'title')))
+            pageNum = len(driver.find_element_by_tag_name("ul").find_elements_by_class_name("page_box"))
+            break
         element = WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CLASS_NAME, 'title')))
-        pageNum = len(driver.find_element_by_tag_name("li").find_elements_by_class_name("page_box"))
+        pageNum = len(driver.find_element_by_tag_name("ul").find_elements_by_class_name("page_box"))
         html = driver.page_source
         soup = BeautifulSoup(html, 'html.parser')
-        url = url[:36] + str(ten * 10 + 1) + '.html'
-        driver.get(url)
         ten += 1
-    print("총", (ten - 2) * 10 + pageNum, "페이지 입니다.")
+        url = url[:36] + str(ten * 10 + 1) + '.html' # ten = 6
+        driver.get(url)
+        pageNum = len(driver.find_element_by_tag_name("ul").find_elements_by_class_name("page_box"))
+        if pageNum <=9:
+            # print(len(driver.find_element_by_tag_name("li").find_elements_by_class_name("page_box")))
+            for i in range(2 , len(driver.find_element_by_tag_name("li").find_elements_by_class_name("page_box"))):
+                element = WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CLASS_NAME, 'title')))
+                pageNum = len(driver.find_element_by_tag_name("ul").find_elements_by_class_name("page_box"))
+                print("안녕", pageNum)
+            break
+        elif pageNum == 10 and len(driver.find_elements_by_class_name("page_box_b")) == 1:
+            break
+        else:
+            continue
+
+
+    print("총", ten * 10 + pageNum, "페이지 입니다.")
     driver.get(url[:36] + str(1) + '.html')
     print("현재 1 페이지 입니다.")
 
-    for i in range(0, (ten - 2) * 10 + pageNum):
+    for i in range(0, ten * 10 + pageNum):
         doc_data = driver.find_elements_by_class_name('title')
         download_data = len(driver.find_elements_by_class_name('contents_list-2'))
         webpage = requests.get(url[:36] + str(i+1) + '.html')
@@ -104,7 +122,7 @@ try:  # 정상 처리
 
         time.sleep(1)  # 웹페이지를 불러오기 위해 2초 정지
 
-        if (j > (ten - 2) * 10 + pageNum):
+        if (j > ten * 10 + pageNum):
             break
 
         url = url[:36] + str(j+2) + '.html'
@@ -121,7 +139,6 @@ finally:  # 정상, 예외 둘 중 하나여도 반드시 실행
     driver.quit()
 
 print("총 다운받은 문서의 개수:", len(doc_list))
-print(len(link))
 
 doc_df = pd.DataFrame({'문서명': doc_list, 'URL': link})
 doc_df = pd.DataFrame(zip(doc_list, link), columns=['문서명', 'URL'])
