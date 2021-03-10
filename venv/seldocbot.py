@@ -64,14 +64,12 @@ try:  # 정상 처리
     if pageNum < 10:
         ten = 2
     while pageNum >= 10:
-        print("페이지수 탐색 시작")
         element = WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CLASS_NAME, 'title')))
         pageNum = len(driver.find_element_by_tag_name("li").find_elements_by_class_name("page_box"))
         print(pageNum)
         html = driver.page_source
         soup = BeautifulSoup(html, 'html.parser')
         url = url[:36] + str(ten * 10 + 1) + '.html'
-        print(url)
         driver.get(url)
         ten += 1
     print("총", (ten - 2) * 10 + pageNum, "페이지 입니다.")
