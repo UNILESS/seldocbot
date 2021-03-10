@@ -88,7 +88,6 @@ try:  # 정상 처리
         else:
             continue
 
-
     print("총", ten * 10 + pageNum, "페이지 입니다.")
     driver.get(url[:36] + str(1) + '.html')
     print("현재 1 페이지 입니다.")
