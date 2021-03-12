@@ -8,14 +8,21 @@ from bs4 import BeautifulSoup
 import time
 import pandas as pd
 import requests
+import pymysql
+
+
+# DB 전역변수
+conn = None
+cur = None
+
+sql = ""
 
 # options about Chrome
 options = webdriver.ChromeOptions()
 options.add_argument('--incognito')
-options.headless = True
+options.headless = True # Headless Mode control
 options.add_argument('disable-gpu')
 options.add_argument('lang=ko_KR')
-
 options.add_experimental_option("prefs", {
     "download.default_directory":
         r"C:/Users/sunup/Desktop/docdown",
@@ -139,9 +146,25 @@ finally:  # must be executed
 
 print("총 다운받은 문서의 개수:", len(doc_list))
 
-doc_df = pd.DataFrame({'문서명': doc_list, 'URL': link})
+doc_df = pd.DataFrame({tuple(doc_list), tuple(link)})
 doc_df = pd.DataFrame(zip(doc_list, link), columns=['문서명', 'URL'])
-doc_df.index = doc_df.index + 1
 
 doc_df.to_csv(f'doc_{user_input}_df.csv', mode='w', encoding='utf-8-sig',header=True, index=True)
 print('웹 크롤링이 완료되었습니다.')
+
+conn = pymysql.connect(host="127.0.0.1", user="root", password="root", db="pythonDB", charset="utf8") # 접속정보
+cursor = conn.cursor()
+
+cursor.execute("DROP TABLE IF EXISTS docs")
+
+cursor.execute("CREATE TABLE docs (`num` int, title text, url text)")
+i = 1
+for item in doc_df:
+    cursor.execute(
+        f"INSERT INTO docs VALUES({i},\"{item[0]}\",\"{item[1]}\")"
+    )
+    i += 1
+
+conn.commit()
+
+conn.close
