@@ -9,6 +9,7 @@ import time
 import pandas as pd
 import requests
 import pymysql
+import datetime
 
 
 # DB 전역변수
@@ -67,6 +68,7 @@ try:  # normal
     element = WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CLASS_NAME, 'title')))
     doc_list = []
     link = []
+    crawled_time = []
     pageNum = len(driver.find_element_by_tag_name("li").find_elements_by_class_name("page_box"))
 
     while True:
@@ -88,7 +90,6 @@ try:  # normal
             for i in range(2 , len(driver.find_element_by_tag_name("li").find_elements_by_class_name("page_box"))):
                 element = WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CLASS_NAME, 'title')))
                 pageNum = len(driver.find_element_by_tag_name("ul").find_elements_by_class_name("page_box"))
-                print("안녕", pageNum)
             break
         elif pageNum == 10 and len(driver.find_elements_by_class_name("page_box_b")) == 1:
             break
@@ -115,6 +116,7 @@ try:  # normal
             link.append("http://freeforms.co.kr" + href.find("a")["href"])
             print(new_url)
             for name_href in soup.select(".contents_list"):
+                crawled_time.insert(i, str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
                 # driver.get(new_url) # to download
                 # time.sleep(1) DDoS warning
                 name = soup.select(".contents_list-1 > a")[i].text
@@ -159,13 +161,12 @@ cursor = conn.cursor()
 
 cursor.execute("DROP TABLE IF EXISTS docs")
 
-cursor.execute("CREATE TABLE docs (`num` int, title text, url text)")
+cursor.execute("CREATE TABLE docs (`num` int, title text, url text, times text)")
 i = 1
-j = 1
 
 for item in doc_list:
     cursor.execute(
-        f"INSERT INTO docs VALUES({i},\"{item[0]}\",\"{link[i-1]}\")"
+        f"INSERT INTO docs VALUES({i},\"{item[0]}\",\"{link[i-1]}\",\"{crawled_time[i-1]}\")"
     )
     i += 1
 
