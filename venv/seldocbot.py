@@ -146,8 +146,8 @@ finally:  # must be executed
 
 print("총 다운받은 문서의 개수:", len(doc_list))
 
-doc_df = pd.DataFrame({tuple(doc_list), tuple(link)})
-doc_df = pd.DataFrame(zip(doc_list, link), columns=['문서명', 'URL'])
+# doc_df = pd.DataFrame({'문서명': doc_list, 'URL': link})
+doc_df = pd.DataFrame(zip(doc_list, link))
 
 doc_df.to_csv(f'doc_{user_input}_df.csv', mode='w', encoding='utf-8-sig',header=True, index=True)
 print('웹 크롤링이 완료되었습니다.')
@@ -159,11 +159,19 @@ cursor.execute("DROP TABLE IF EXISTS docs")
 
 cursor.execute("CREATE TABLE docs (`num` int, title text, url text)")
 i = 1
-for item in doc_df:
+j = 1
+
+for item in doc_list:
     cursor.execute(
-        f"INSERT INTO docs VALUES({i},\"{item[0]}\",\"{item[1]}\")"
+        f"INSERT INTO docs VALUES({i},\"{item[0]}\",NULL)"
     )
     i += 1
+
+for item_1 in link:
+    cursor.execute(
+        f"UPDATE docs SET url = \"{item_1}\""
+    )
+    j += 1
 
 conn.commit()
 
