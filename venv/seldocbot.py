@@ -152,6 +152,8 @@ doc_df = pd.DataFrame(zip(doc_list, link))
 doc_df.to_csv(f'doc_{user_input}_df.csv', mode='w', encoding='utf-8-sig',header=True, index=True)
 print('웹 크롤링이 완료되었습니다.')
 
+# DB 저장
+
 conn = pymysql.connect(host="127.0.0.1", user="root", password="root", db="pythonDB", charset="utf8") # 접속정보
 cursor = conn.cursor()
 
