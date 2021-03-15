@@ -165,15 +165,12 @@ j = 1
 
 for item in doc_list:
     cursor.execute(
-        f"INSERT INTO docs VALUES({i},\"{item[0]}\",NULL)"
+        f"INSERT INTO docs VALUES({i},\"{item[0]}\",\"{link[i-1]}\")"
     )
     i += 1
 
-for item_1 in link:
-    cursor.execute(
-        f"UPDATE docs SET url = \"{item_1}\""
-    )
-    j += 1
+
+
 
 conn.commit()
 
