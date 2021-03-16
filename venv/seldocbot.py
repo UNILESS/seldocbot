@@ -163,15 +163,12 @@ cursor.execute("DROP TABLE IF EXISTS docs")
 
 cursor.execute("CREATE TABLE docs (`num` int, title text, url text, times text)")
 i = 1
-
+crawled_time = list(reversed(crawled_time))
 for item in doc_list:
     cursor.execute(
         f"INSERT INTO docs VALUES({i},\"{item[0]}\",\"{link[i-1]}\",\"{crawled_time[i-1]}\")"
     )
     i += 1
-
-
-
 
 conn.commit()
 
